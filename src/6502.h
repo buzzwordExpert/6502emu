@@ -1,9 +1,7 @@
-#ifndef CPU_H
-#define CPU_H
-
 #include <stdint.h>
 #include <stdbool.h>
-#include "memory.h"
+
+#define MAX_MEM (1024 * 64)  // 64 KB
 
 // Status Flag
 #define FLAG_C (1 << 0)     // Carry Flag
@@ -23,7 +21,6 @@ typedef struct {
     uint64_t cycles;
 } CPU;
 
-void reboot(CPU *cpu, MEM *mem);
-
-
-#endif // CPU_H
+typedef struct {
+    uint8_t DATA[MAX_MEM];
+} MEM;
