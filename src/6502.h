@@ -28,7 +28,7 @@ typedef struct {
 
 void cpu_reset(CPU *cpu, const MEM *mem);
 void reboot(CPU *cpu, const MEM *mem); 
-bool cpu_step(CPU *cpu, MEM *mem);
+bool cpu_execute_instruction(CPU *cpu, MEM *mem);
 void cpu_irq(CPU *cpu, MEM *mem);
 void cpu_nmi(CPU *cpu, MEM *mem);
 
