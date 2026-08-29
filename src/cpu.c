@@ -15,11 +15,54 @@ void reboot(CPU *cpu, const MEM *mem) {
     cpu_reset(cpu, mem);
 }
 
-bool cpu_execite_instruction(CPU *cpu, MEM *mem) {
-    (void)cpu;
-    (void)mem;
+static uint8_t fetch_byte(CPU *cpu, const MEM *mem) {
+    return bus_read(mem, cpu->PC++);
+}
 
-    return false;
+static uint16_t fetch_word(CPU *cpu, const MEM *mem) {
+    uint8_t low = fetch_byte(cpu, mem);
+    uint8_t high = fetch_byte(cpu, mem);
+
+    return ((uint16_t) high << 8) | low;
+}
+
+static void update_zero_negative(CPU *cpu, uint8_t value) {
+    if (value == 0) {
+        cpu->CPU_STATUS |= FLAG_Z;
+    }
+    else {
+        cpu->CPU_STATUS &= ~FLAG_Z;
+    }
+
+    if (value & 0x80) {
+        cpu->CPU_STATUS |= FLAG_N;
+    }
+    else {
+        cpu->CPU_STATUS &= ~FLAG_N;
+    }
+}
+
+bool cpu_execute_instruction(CPU *cpu, MEM *mem) {
+    uint8_t opcode = fetch_byte(cpu, mem);
+
+    switch(opcode) {
+        case (0xA9): { // LDA Immediate
+            cpu->A = fetch_byte(cpu, mem);
+            update_zero_negative(cpu, cpu->A);
+            cpu->cycles += 2;
+            return true;
+        }
+        case (0xA5): {  // LDA Zero Page
+            uint16_t address = fetch_byte(cpu, mem);
+            cpu->A = bus_read(mem, address);
+            update_zero_negative(cpu, cpu->A);
+            cpu->cycles += 3;
+            return true;
+        }
+    
+        default:
+            return false;   // Instruction not implemented 
+    }
 }
 
 void cpu_irq(CPU *cpu, MEM *mem) {

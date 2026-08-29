@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+# Local build output
+build/
+
 # Object files
 *.o
 *.ko

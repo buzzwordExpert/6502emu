@@ -6,6 +6,30 @@
 
 #define MAX_MEM (1024 * 64)  // 64 KB
 
+
+// -------- MEMORY --------
+
+typedef uint8_t (*bus_device_read_fn)(void *context, uint16_t address);
+typedef void (*bus_device_write_fn)(void *context, uint16_t address, uint8_t value);
+
+typedef struct {
+    bus_device_read_fn read;
+    bus_device_write_fn write;
+    void *context;
+} BUS_DEVICE;
+
+typedef struct {
+    uint8_t DATA[MAX_MEM];
+    const BUS_DEVICE *devices[MAX_MEM];
+} MEM;
+
+
+void bus_init(MEM *mem);
+uint8_t bus_read(const MEM *mem, uint16_t address);
+void bus_write(MEM *mem, uint16_t address, uint8_t value);
+void bus_map_device(MEM *mem, uint16_t start, uint16_t end,
+                    const BUS_DEVICE *device);
+
 // -------- CPU --------
 
 // Status Flag
@@ -32,28 +56,5 @@ bool cpu_execute_instruction(CPU *cpu, MEM *mem);
 void cpu_irq(CPU *cpu, MEM *mem);
 void cpu_nmi(CPU *cpu, MEM *mem);
 
-
-// -------- MEMORY --------
-
-typedef uint8_t (*bus_device_read_fn)(void *context, uint16_t address);
-typedef void (*bus_device_write_fn)(void *context, uint16_t address, uint8_t value);
-
-typedef struct {
-    bus_device_read_fn read;
-    bus_device_write_fn write;
-    void *context;
-} BUS_DEVICE;
-
-typedef struct {
-    uint8_t DATA[MAX_MEM];
-    const BUS_DEVICE *devices[MAX_MEM];
-} MEM;
-
-
-void bus_init(MEM *mem);
-uint8_t bus_read(const MEM *mem, uint16_t address);
-void bus_write(MEM *mem, uint16_t address, uint8_t value);
-void bus_map_device(MEM *mem, uint16_t start, uint16_t end,
-                    const BUS_DEVICE *device);
 
 #endif /* EMU6502_H */
